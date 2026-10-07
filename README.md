@@ -25,7 +25,7 @@ Requires OpenCode v2 and `opencode-models-discovery` with `modelInfoFormat: "lla
     "opencode-models-discovery",
     "opencode-llama-swap-variants"
     // or with options:
-    // { "package": "opencode-llama-swap-variants", "options": { "bodyPath": "reasoning_effort" } }
+    // { "package": "opencode-llama-swap-variants", "options": { "bodyPath": "chat_template_kwargs.reasoning_effort" } }
   ]
 }
 ```
@@ -76,10 +76,12 @@ default effort. Use `reasoning_effort?:` (set only if absent) or no base entry a
 
 ### Pitfall: template support
 
-The effort only does something if the model's chat template reads it. By default it is
-sent as `chat_template_kwargs.reasoning_effort`, which the gpt-oss and Qwen3 templates read.
-llama-server also maps a top-level `reasoning_effort` field (set `bodyPath: "reasoning_effort"`);
-when both are sent, the top-level field wins.
+The effort only does something if the backend maps it into the model's chat template.
+By default it is sent as the standard top-level `reasoning_effort` field, which stock
+llama-server maps into the template (and vLLM and other OpenAI-compatible backends accept).
+If your server ignores the top-level field, set `bodyPath: "chat_template_kwargs.reasoning_effort"`
+to pass it as a template kwarg instead (read by the gpt-oss and Qwen3 templates). When both
+reach llama-server, the top-level field wins over the kwarg.
 
 ## Options
 
@@ -88,7 +90,7 @@ All optional; defaults reproduce the behaviour above.
 ```jsonc
 "plugins": [
   { "package": "github:NubeBuster/opencode-llama-swap-variants",
-    "options": { "providers": ["my-server"], "bodyPath": "reasoning_effort" } }
+    "options": { "providers": ["my-server"], "bodyPath": "chat_template_kwargs.reasoning_effort" } }
 ]
 ```
 
@@ -97,7 +99,7 @@ All optional; defaults reproduce the behaviour above.
 | `modelInfoFormat` | `"llama-swap"` | Handle every provider whose `settings.modelsDiscovery.modelInfoFormat` equals this. `""` disables the match (use `providers` only). |
 | `providers` | `[]` | Extra provider ids to handle regardless of `modelInfoFormat`. Needs `settings.baseURL`. |
 | `metadataKey` | `"reasoning_efforts"` | Key under `meta.llamaswap` holding a model's effort list. |
-| `bodyPath` | `"chat_template_kwargs.reasoning_effort"` | Dotted request-body path that receives the effort. `"reasoning_effort"` sends it top-level. |
+| `bodyPath` | `"reasoning_effort"` | Dotted request-body path that receives the effort. `"chat_template_kwargs.reasoning_effort"` sends it as a chat-template kwarg instead. |
 | `hideAliases` | `true` | Remove `<model><separator><effort>` entries that llama-swap lists as aliases of the model. |
 | `separator` | `":"` | Separator in those alias ids. |
 | `timeoutMs` | `5000` | Timeout for the `/v1/models` fetch. |

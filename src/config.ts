@@ -6,7 +6,7 @@ export interface PluginConfig {
   modelInfoFormat: string
   /** Key under `meta.llamaswap` in `/v1/models` that lists a model's efforts. */
   metadataKey: string
-  /** Dotted path in the request body that receives the effort. */
+  /** Dotted path in the request body that receives the effort (e.g. "chat_template_kwargs.reasoning_effort"). */
   bodyPath: string
   /** Remove `<model><separator><effort>` alias entries from the model list. */
   hideAliases: boolean
@@ -20,7 +20,7 @@ export const DEFAULT_CONFIG: PluginConfig = {
   providers: [],
   modelInfoFormat: "llama-swap",
   metadataKey: "reasoning_efforts",
-  bodyPath: "chat_template_kwargs.reasoning_effort",
+  bodyPath: "reasoning_effort",
   hideAliases: true,
   separator: ":",
   timeoutMs: 5000,

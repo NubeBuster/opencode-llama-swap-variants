@@ -52,8 +52,8 @@ describe("foldEfforts", () => {
     const folded = foldEfforts(models, catalog, DEFAULT_CONFIG)
     expect(folded.map((model) => model.id)).toEqual(["gpt", "gpt:bg", "plain"])
     expect(folded[0].variants).toEqual([
-      { id: "low", body: { chat_template_kwargs: { reasoning_effort: "low" } } },
-      { id: "high", body: { chat_template_kwargs: { reasoning_effort: "high" } } },
+      { id: "low", body: { reasoning_effort: "low" } },
+      { id: "high", body: { reasoning_effort: "high" } },
     ])
   })
   test("hideAliases off keeps aliases", () => {
@@ -65,8 +65,8 @@ describe("foldEfforts", () => {
     expect(folded[0].variants?.map((variant) => variant.id)).toEqual(["low", "high"])
   })
   test("custom body path", () => {
-    const folded = foldEfforts([{ id: "gpt" }], catalog, { ...DEFAULT_CONFIG, bodyPath: "reasoning_effort" })
-    expect(folded[0].variants?.[0].body).toEqual({ reasoning_effort: "low" })
+    const folded = foldEfforts([{ id: "gpt" }], catalog, { ...DEFAULT_CONFIG, bodyPath: "chat_template_kwargs.reasoning_effort" })
+    expect(folded[0].variants?.[0].body).toEqual({ chat_template_kwargs: { reasoning_effort: "low" } })
   })
 })
 
