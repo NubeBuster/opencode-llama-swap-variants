@@ -1,5 +1,6 @@
 import { foldEfforts, parseEffortCatalog, type EffortCatalog, type ModelInfo } from "./catalog.js"
 import { resolveConfig, type PluginConfig } from "./config.js"
+import { requireDiscovery } from "./dependency.js"
 
 export { parseEffortCatalog, foldEfforts } from "./catalog.js"
 export type { EffortCatalog, ModelInfo, Variant } from "./catalog.js"
@@ -62,8 +63,10 @@ async function fetchCatalog(provider: TargetProvider, config: PluginConfig): Pro
 export default {
   id: "opencode-llama-swap-variants",
   async setup(ctx: any) {
+    const controller = new AbortController()
     const config = resolveConfig(ctx.options)
     const catalogs = new Map<string, EffortCatalog>()
+    let dependencyReady = false
 
     // Registered only once a target provider exists: transforms run in
     // registration order, and models-discovery (which creates the provider and
@@ -73,6 +76,7 @@ export default {
       if (transformRegistered) return
       transformRegistered = true
       await ctx.provider.transform((editor: any) => {
+        if (!dependencyReady || controller.signal.aborted) return
         for (const record of editor.list()) {
           const catalog = catalogs.get(record.provider.id)
           if (!catalog || catalog.size === 0) continue
@@ -83,10 +87,12 @@ export default {
     }
 
     const refresh = async () => {
+      if (!dependencyReady || controller.signal.aborted) return
       try {
         const providers = await targetProviders(ctx, config)
         catalogs.clear()
         await Promise.all(providers.map(async (provider) => catalogs.set(provider.id, await fetchCatalog(provider, config))))
+        if (!dependencyReady || controller.signal.aborted) return
         if (catalogs.size > 0) await registerTransform()
         await ctx.provider.reload()
       } catch {
@@ -94,20 +100,44 @@ export default {
       }
     }
 
-    await refresh()
-    void (async () => {
-      // Config may still be loading: poll briefly until a target provider shows up.
-      for (let attempt = 0; attempt < 10 && catalogs.size === 0; attempt++) {
-        await new Promise((resolve) => setTimeout(resolve, 250))
-        await refresh()
-      }
-    })()
+    // Recheck inventory updates too: dependency installation can finish in the
+    // background, and a previously active dependency can fail or be disabled.
+    let validation: Promise<void> | undefined
+    const validate = (): Promise<void> => {
+      if (validation) return validation
+      validation = (async () => {
+        try {
+          if (!await requireDiscovery(ctx, controller.signal)) return
+          if (dependencyReady) return
+          dependencyReady = true
+          await refresh()
+          // Config may still be loading: poll briefly until a target provider shows up.
+          for (let attempt = 0; attempt < 10 && catalogs.size === 0 && !controller.signal.aborted; attempt++) {
+            await new Promise((resolve) => setTimeout(resolve, 250))
+            await refresh()
+          }
+        } catch (error) {
+          const wasReady = dependencyReady
+          dependencyReady = false
+          catalogs.clear()
+          if (!controller.signal.aborted) console.error(error)
+          if (wasReady && !controller.signal.aborted) await ctx.provider.reload()
+        }
+      })().finally(() => { validation = undefined })
+      return validation
+    }
+
+    void validate().catch((error) => { if (!controller.signal.aborted) console.error(error) })
     void (async () => {
       try {
-        for await (const event of ctx.event.subscribe()) if (event.type === "config.updated") await refresh()
-      } catch {
-        // Event stream closed; the catalog stays as last fetched.
+        for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
+          if (event.type === "plugin.updated") await validate()
+          if (event.type === "config.updated") await refresh()
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) console.error(error)
       }
     })()
+    return () => controller.abort()
   },
 }
