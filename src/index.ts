@@ -1,10 +1,10 @@
-import { foldEfforts, parseEffortCatalog, type EffortCatalog, type ModelInfo } from "./catalog"
-import { resolveConfig, type PluginConfig } from "./config"
+import { foldEfforts, parseEffortCatalog, type EffortCatalog, type ModelInfo } from "./catalog.js"
+import { resolveConfig, type PluginConfig } from "./config.js"
 
-export { parseEffortCatalog, foldEfforts } from "./catalog"
-export type { EffortCatalog, ModelInfo, Variant } from "./catalog"
-export { resolveConfig, bodyForEffort, DEFAULT_CONFIG } from "./config"
-export type { PluginConfig } from "./config"
+export { parseEffortCatalog, foldEfforts } from "./catalog.js"
+export type { EffortCatalog, ModelInfo, Variant } from "./catalog.js"
+export { resolveConfig, bodyForEffort, DEFAULT_CONFIG } from "./config.js"
+export type { PluginConfig } from "./config.js"
 
 interface TargetProvider {
   id: string

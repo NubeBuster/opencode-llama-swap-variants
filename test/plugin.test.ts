@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { bodyForEffort, DEFAULT_CONFIG, foldEfforts, parseEffortCatalog, resolveConfig, toTargetProvider } from "../src"
+import { bodyForEffort, DEFAULT_CONFIG, foldEfforts, parseEffortCatalog, resolveConfig, toTargetProvider } from "../src/index.js"
 
 const payload = {
   data: [

@@ -1,4 +1,4 @@
-import { bodyForEffort, stringList, type PluginConfig } from "./config"
+import { bodyForEffort, stringList, type PluginConfig } from "./config.js"
 
 export interface Variant {
   id: string

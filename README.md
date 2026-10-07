@@ -18,34 +18,34 @@ which creates the provider and its models; this plugin only decorates them.
 
 Requires OpenCode v2 and `opencode-models-discovery` with `modelInfoFormat: "llama-swap"`.
 
-```sh
-git clone https://github.com/NubeBuster/opencode-llama-swap-variants ~/.local/share/opencode-llama-swap-variants
-```
-
 ```jsonc
 // opencode.jsonc
 {
   "plugins": [
     "opencode-models-discovery",
-    { "package": "/home/you/.local/share/opencode-llama-swap-variants" }
+    "opencode-llama-swap-variants"
+    // or with options:
+    // { "package": "opencode-llama-swap-variants", "options": { "bodyPath": "reasoning_effort" } }
   ]
 }
 ```
 
-Use an absolute path. The transform is registered lazily, so it runs after
-`opencode-models-discovery` has created the models regardless of plugin order.
+or `opencode plugin add opencode-llama-swap-variants`. Pin a version
+(`opencode-llama-swap-variants@0.1.0`) to stop OpenCode checking for updates.
+The transform is registered lazily, so it runs after `opencode-models-discovery`
+has created the models regardless of plugin order.
 
-Alternatives (OpenCode loads TypeScript directly, there is no build step):
+Alternatives (the clone-based routes run the TypeScript source directly, no build needed):
 
-- **Directory entry** (verified, used above): the directory must contain a root `index.ts` (it does). A path to a single
+- **Directory entry** (verified): clone the repo and list its directory; the directory must contain a root `index.ts` (it does). A path to a single
   file is rejected ("configured plugin path must be a directory").
   ```jsonc
   { "package": "/path/to/opencode-llama-swap-variants", "options": { } }
   ```
 - **Drop-in directory**: put a copy of the repo under `~/.config/opencode/plugins/` (or a
   project's `.opencode/plugins/`); plugins found there load automatically, without options.
-- **Git / npm install** (`opencode plugin add github:NubeBuster/opencode-llama-swap-variants`)
-  uses the same package layout but was not exercised end to end.
+- **Packed tarball** (verified): `{ "package": "opencode-llama-swap-variants@file:/path/to.tgz" }`
+  loads `dist/index.js` through OpenCode's npm cache.
 
 Options reach the plugin as `ctx.options` and come only from the object form of the
 `plugins` entry (see below).
@@ -115,8 +115,10 @@ This happens without this plugin too.
 ## Develop
 
 ```sh
-bun test
+npm install && npm run build && bun test
 ```
+
+Publishing: push a `v*` tag; the GitHub Action publishes with provenance and needs an `NPM_TOKEN` repository secret.
 
 ## License
 

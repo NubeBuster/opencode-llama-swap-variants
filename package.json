@@ -3,19 +3,28 @@
   "version": "0.1.0",
   "description": "OpenCode plugin: turns llama-swap's advertised reasoning efforts into model variants",
   "type": "module",
-  "main": "./index.ts",
+  "main": "./dist/index.js",
   "exports": {
-    ".": "./index.ts",
-    "./server": "./index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "files": [
-    "index.ts",
+    "dist",
     "src",
+    "index.ts",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "test": "bun test"
+    "build": "tsc",
+    "test": "bun test",
+    "prepublishOnly": "npm run build && bun test"
   },
   "keywords": [
     "opencode",
@@ -23,5 +32,23 @@
     "llama-swap",
     "llama.cpp"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NubeBuster/opencode-llama-swap-variants.git"
+  },
+  "homepage": "https://github.com/NubeBuster/opencode-llama-swap-variants#readme",
+  "bugs": {
+    "url": "https://github.com/NubeBuster/opencode-llama-swap-variants/issues"
+  },
+  "engines": {
+    "opencode": ">=1.18.29"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
