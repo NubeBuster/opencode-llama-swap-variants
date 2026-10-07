@@ -142,7 +142,7 @@ opencode plugin add opencode-models-discovery
 opencode plugin add opencode-llama-swap-variants
 ```
 
-Pin an exact version (`opencode-llama-swap-variants@1.0.0`) to stop OpenCode checking
+Pin an exact version (`opencode-llama-swap-variants@1.0.1`) to stop OpenCode checking
 that package for updates. You can also use
 `github:NubeBuster/opencode-llama-swap-variants` as the package target.
 
