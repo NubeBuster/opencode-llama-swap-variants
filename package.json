@@ -1,0 +1,27 @@
+{
+  "name": "opencode-llama-swap-variants",
+  "version": "0.1.0",
+  "description": "OpenCode plugin: turns llama-swap's advertised reasoning efforts into model variants",
+  "type": "module",
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./server": "./index.ts"
+  },
+  "files": [
+    "index.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "bun test"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "llama-swap",
+    "llama.cpp"
+  ],
+  "license": "MIT"
+}
