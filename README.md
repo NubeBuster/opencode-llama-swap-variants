@@ -203,7 +203,11 @@ field takes precedence when both it and the kwarg are supplied.
 npm install && npm run build && bun test
 ```
 
-Publishing: push a `v*` tag; the GitHub Action publishes with provenance and needs an `NPM_TOKEN` repository secret.
+Publishing: push a `v*` tag matching the package version. The GitHub Action uses
+npm Trusted Publishing (OIDC), with provenance and no `NPM_TOKEN` secret. Configure
+the package's trusted publisher on npm for `NubeBuster/opencode-llama-swap-variants`
+and workflow `publish.yml`, allowing `npm publish`. A new trust configuration must
+complete a successful publish within two days to validate it.
 
 </details>
 
