@@ -1,7 +1,8 @@
 {
   "name": "opencode-llama-swap-variants",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "OpenCode plugin: turns llama-swap's advertised reasoning efforts into model variants",
+  "author": "Mark Cockram",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
@@ -43,7 +44,7 @@
     "url": "https://github.com/NubeBuster/opencode-llama-swap-variants/issues"
   },
   "engines": {
-    "opencode": ">=1.18.29"
+    "opencode": ">=2.0.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
